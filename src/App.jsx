@@ -1,14 +1,13 @@
 import React from 'react'
-
+import LandingPage from './pages/landingpage/home'
 
 function App() {
 
   return (
     <>
-      <div>
-        <h1 className="text-3xl font-bold underline flex justify-center items-center min-h-screen"> hello world</h1>
-      </div>
-
+    <div className="leading-normal tracking-normal text-white gradient" style={{ fontFamily: "'Source Sans Pro', sans-serif" }}>
+      <LandingPage />
+    </div>
       {/* untuk memanggil landing page nantinya */}
     </>
   )

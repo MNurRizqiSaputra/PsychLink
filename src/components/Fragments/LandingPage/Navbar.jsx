@@ -1,5 +1,6 @@
 import React from 'react'
 import logo from '../../../assets/images/logo3.png'
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
 
@@ -50,12 +51,14 @@ const Navbar = () => {
               <a className="inline-block px-4 py-2 text-black no-underline hover:text-gray-800 hover:text-underline" href="#kontak">Kontak</a>
             </li>
           </ul>
+          <Link to="/login">
           <button
             id="navAction"
             className="px-8 py-4 mx-auto mt-4 font-bold text-gray-800 transition duration-300 ease-in-out transform bg-white rounded-full shadow opacity-75 lg:mx-0 hover:underline lg:mt-0 focus:outline-none focus:shadow-outline hover:scale-105"
           >
             Login
           </button>
+          </Link>
         </div>
       </div>
       <hr className="py-0 my-0 border-b border-gray-100 opacity-25" />

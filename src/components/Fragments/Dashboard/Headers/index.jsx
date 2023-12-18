@@ -1,66 +1,92 @@
-import Logo from "../../../../assets/images/logo3.png";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-
-
+import Logo from "../../../../assets/images/logo3.png";
 
 function Header() {
-    const email = localStorage.getItem("email");
+  // State untuk menyimpan informasi pengguna yang login
+  const [user, setUser] = useState(getUserFromLocalStorage());
 
-    return (
-        <header>
-            {/* <!--Nav--> */}
-            <nav
-                aria-label="menu nav"
-                className="bg-gray-800 pt-2 md:pt-1 pb-1 px-1 mt-0 h-auto fixed w-full z-20 top-0"
-            >
-                <div className="flex flex-wrap items-center">
-                    <div className="flex flex-shrink md:w-1/3 justify-center md:justify-start text-white">
-                        <img
-                            className="h-8 rounded-full mr-2"
-                            src={Logo}
-                            alt="Profile"
-                        />
-                    </div>
+  // Fungsi untuk mendapatkan informasi pengguna dari local storage
+  function getUserFromLocalStorage() {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  }
 
+  // Fungsi untuk melakukan logout
+  function handleLogout() {
+    // Hapus informasi pengguna dari local storage
+    localStorage.removeItem("user");
+    // Hapus informasi pengguna dari state
+    setUser(null);
+    // Redirect ke halaman login
+    window.location.href = "/";
+  }
 
-                    <div className="flex justify-center md:w-1/3">
-                        
-                    </div>
+  return (
+    <header>
+      {/* <!--Nav--> */}
+      <nav
+        aria-label="menu nav"
+        className="fixed top-0 z-20 w-full h-auto px-1 pt-2 pb-1 mt-0 bg-gray-800 md:pt-1"
+      >
+        <div className="flex flex-wrap items-center">
+          <div className="flex justify-center flex-shrink text-white md:w-1/3 md:justify-start">
+            <img
+              className="h-8 mr-2 rounded-full"
+              src={Logo}
+              alt="Profile"
+            />
+          </div>
 
-                    <div className="flex w-full pt-2 content-center justify-between md:w-1/3 md:justify-end">
+          <div className="flex justify-center md:w-1/3"></div>
 
-                        <ul className="list-reset flex justify-between flex-1 md:flex-none items-center">
-                            <li className="flex-1 md:flex-none md:mr-3">
-                                <div className="relative inline-block">
-                                    <button
-                                        className="drop-button text-white py-2 px-2"
-                                    >
-                                        <span className="pr-2">
-                                            <i className="em em-robot_face"></i>
-                                        </span>{" "}
-                                        Hi, {email}
-                                    </button>
-                                </div>
-                            </li>
-                            <button className="border border-rounded border-white mr-2 text-center">
-                                <li className="flex-1 md:flex-none md:mr-3">
-                                <Link to="/">
-                                    <div className="inline-block py-2 px-4 text-white mr-2 text-center">
-                                        <i className="fas fa-sign-out-alt mr-3"></i>
-                                        Logout
-                                    </div>
-                                </Link>
-                                </li>
-                            </button>
-
-
-                        </ul>
-                    </div>
+          <div className="flex content-center justify-between w-full pt-2 md:w-1/3 md:justify-end">
+            <ul className="flex items-center justify-between flex-1 list-reset md:flex-none">
+              <li className="flex-1 md:flex-none md:mr-3">
+                <div className="relative inline-block">
+                  {/* Tampilkan nama pengguna jika ada */}
+                  {user && (
+                    <button className="px-2 py-2 text-white drop-button">
+                      <span className="pr-2">
+                        <i className="em em-robot_face"></i>
+                      </span>{" "}
+                      Hi, {user.username}
+                    </button>
+                  )}
                 </div>
-            </nav>
-            {/* <!--End Nav--> */}
-        </header>
-    );
+              </li>
+
+              <button className="mr-2 text-center border border-white border-rounded">
+                <li className="flex-1 md:flex-none md:mr-3">
+                  {/* Tampilkan tombol Logout jika pengguna login */}
+                  {user && (
+                    <div
+                      className="inline-block px-4 py-2 mr-2 text-center text-white"
+                      onClick={handleLogout}
+                    >
+                      <i className="mr-3 fas fa-sign-out-alt"></i>
+                      Logout
+                    </div>
+                  )}
+
+                  {/* Tampilkan tombol Login jika pengguna tidak login */}
+                  {!user && (
+                    <Link to="/">
+                      <div className="inline-block px-4 py-2 mr-2 text-center text-white">
+                        <i className="mr-3 fas fa-sign-out-alt"></i>
+                        Logout
+                      </div>
+                    </Link>
+                  )}
+                </li>
+              </button>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      {/* <!--End Nav--> */}
+    </header>
+  );
 }
 
 export default Header;

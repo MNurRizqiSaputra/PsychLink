@@ -9,7 +9,11 @@ import RegisterPage from './pages/authentikasi/register.jsx'
 import HomePasien from './pages/dahboard/pasien/index.jsx'
 import HomeAdmin from './pages/dahboard/admin/index.jsx'
 import HomePsikolog from './pages/dahboard/psikolog/index.jsx'
+import withAuth from './withAuth.jsx'
 
+const Authhomeadmin = withAuth(HomeAdmin);
+const Authhomepsikolog = withAuth(HomePsikolog);
+const Authhomepasien = withAuth(HomePasien);
 
 const router = createBrowserRouter([
   {
@@ -27,15 +31,15 @@ const router = createBrowserRouter([
   },
   {
     path: '/homepasien',
-    element : <HomePasien />
+    element : <Authhomepasien />
   },
   {
     path: '/homeadmin',
-    element : <HomeAdmin />
+    element : <Authhomeadmin />
   },
   {
     path: '/homepsikolog',
-    element: <HomePsikolog /> 
+    element: <Authhomepsikolog />
   }
 ])
 

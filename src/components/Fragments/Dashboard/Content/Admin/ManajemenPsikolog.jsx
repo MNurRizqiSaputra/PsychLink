@@ -1,8 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 function ManajemenPsikolog () {
+  const [records, setRecords] = useState([]);
+  const [psikologs, setPsikologs] = useState([]);
+  
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/users");
+      const users = response.data.filter(row => row.role === 'psikolog');
+
+      setPsikologs(users);
+      setRecords(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   const customStyles = {    
     rows: {
       style: {
@@ -23,31 +43,41 @@ function ManajemenPsikolog () {
       },
     },
   };
+  
   const handleEditClick = (id) => {
-    // console.log(`You clicked me! ${id}`);
-    const findData = data.find((data) => data.id === id);
-    const foundedName = findData.namaPsikolog
-    // console.log(findData)
+    const findData = psikologs.find((data) => data.id === id);
     Swal.fire({
       title: "Mengedit Psikolog",
-      input: "text",
-      inputLabel: "Nama Psikolog",
-      inputValue: foundedName,
+      html:
+      '<p> Nama Psikolog </p>' +
+      `<input id="namaPsikolog" class="w-3/4 swal2-input mt-2 mb-3 text-base" value=${findData.username}>` +
+      '<p> Email Psikolog </p>' +
+      `<input id="emailPsikolog" class="w-3/4 swal2-input mt-2 mb-3 text-base" value=${findData.email}>` +
+      '<p> Password Psikolog </p>' +
+      `<input id="passPsikolog" class="w-3/4 swal2-input mt-2 text-base" value=${findData.password}>`,
       showCancelButton: true,
-      inputValidator: (value) => {
-        if (!value) {
-          return "Masukkan nama Psikolog!";
+      preConfirm: () => {
+        if (document.getElementById("namaPsikolog").value == '' || document.getElementById("emailPsikolog").value == '' || document.getElementById("passPsikolog").value == '') {
+          Swal.showValidationMessage("Pastikan semua data Psikolog terisi"); // Show error when validation fails.
         }
       }
     }).then((result) => {
       if (result.isConfirmed) {
+        const newName = document.getElementById("namaPsikolog").value;
+        const newEmail = document.getElementById("emailPsikolog").value;
+        const newPass = document.getElementById("passPsikolog").value;
+        
+        axios.put(`http://localhost:3000/users/${id}`, { 'username': newName, 'email': newEmail, 'password': newPass, 'role': 'psikolog' })
+        .then(() => {
+          fetchUsers();
+        })
         Swal.fire("Saved!", "", "success");
       }
     });
   };
   const handleDeleteClick = (id) => {
-    const findData = data.find((data) => data.id === id);
-    const foundedName = findData.namaPsikolog
+    const findData = psikologs.find((data) => data.id === id);
+    const foundedName = findData.username
     Swal.fire({
       title: `Apakah anda yakin ingin menghapus ${foundedName}?`,
       text: "Anda tidak bisa membatalkan penghapusan!",
@@ -58,6 +88,10 @@ function ManajemenPsikolog () {
       confirmButtonText: "Ya, Hapus!"
     }).then((result) => {
       if (result.isConfirmed) {
+        axios.delete(`http://localhost:3000/users/${id}`)
+        .then(() => {
+          fetchUsers();
+        })
         Swal.fire({
           title: "Berhasil!",
           text: "Psikolog berhasil dihapus.",
@@ -68,18 +102,31 @@ function ManajemenPsikolog () {
   };
   const handleAddClick = () => {
     Swal.fire({
-      title: "Menambahkan Psikolog",
-      input: "text",
-      inputLabel: "Nama Psikolog",
-      inputPlaceholder: "Masukkan nama psikolog",
+      title: "Menambah Psikolog",
+      html:
+      '<p> Nama Psikolog </p>' +
+      `<input id="namaPsikolog" class="w-3/4 swal2-input mt-2 mb-3 text-base" placeHolder="Masukkan nama Psikolog">` +
+      '<p> Email Psikolog </p>' +
+      `<input id="emailPsikolog" class="w-3/4 swal2-input mt-2 mb-3 text-base" placeHolder="Masukkan email Psikolog">`+
+      '<p> Password Psikolog </p>' +
+      `<input id="passPsikolog" class="w-3/4 swal2-input mt-2 text-base" placeHolder="Masukkan password Psikolog">`,
       showCancelButton: true,
-      inputValidator: (value) => {
-        if (!value) {
-          return "Masukkan nama Psikolog!";
+      preConfirm: () => {
+        if (document.getElementById("namaPsikolog").value == '' || document.getElementById("emailPsikolog").value == '' || document.getElementById("passPsikolog").value == '') {
+          Swal.showValidationMessage("Pastikan semua data Psikolog terisi"); // Show error when validation fails.
+          // Swal.enableConfirmButton(); // Enable the confirm button again.
         }
       }
     }).then((result) => {
       if (result.isConfirmed) {
+        const newName = document.getElementById("namaPsikolog").value;
+        const newEmail = document.getElementById("emailPsikolog").value;
+        const newPass = document.getElementById("passPsikolog").value;
+
+        axios.post(`http://localhost:3000/users`, { 'username': newName, 'email': newEmail, 'password': newPass, 'role': 'psikolog' })
+        .then(() => {
+          fetchUsers();
+        })
         Swal.fire("Saved!", "", "success");
       }
     });
@@ -88,7 +135,17 @@ function ManajemenPsikolog () {
   const columns = [
     {
       name: 'Nama Psikolog',
-      selector: row => row.namaPsikolog,
+      selector: row => row.username,
+      sortable: true
+    },
+    {
+      name: 'Email',
+      selector: row => row.email,
+      sortable: true
+    },
+    {
+      name: 'Password',
+      selector: row => row.password,
       sortable: true
     },
     {
@@ -114,26 +171,10 @@ function ManajemenPsikolog () {
       ]
     }
   ];
-  const data = [
-    {
-      id: 1,
-      namaPsikolog: 'Psikolog 1'
-    },
-    {
-      id: 2,
-      namaPsikolog: 'Psikolog 2',
-    },
-    {
-      id: 3,
-      namaPsikolog: 'Psikolog 3',
-    }
-  ];
-
-  const [records, setRecords] = useState(data);
 
   function handleFilter(e) {
-    const newData = data.filter(row => {
-      return row.namaPsikolog.toLowerCase().includes(e.target.value.toLowerCase())
+    const newData = psikologs.filter(row => {
+      return row.username.toLowerCase().includes(e.target.value.toLowerCase())
     })
     setRecords(newData)
   }

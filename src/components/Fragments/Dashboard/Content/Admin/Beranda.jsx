@@ -83,7 +83,7 @@ function BerandaAdmin() {
                             </div>
                             <div className="flex-1 text-right md:text-center">
                                 <h2 className="font-bold text-gray-600 uppercase">
-                                    Manajemen Pengguna
+                                    Manajemen Pasien
                                 </h2>
                                 {/* Isi dengan data dinamis jika diperlukan */}
                             </div>

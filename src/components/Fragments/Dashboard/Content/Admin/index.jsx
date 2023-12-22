@@ -16,7 +16,7 @@ const Content = ({ selectedMenu }) => {
     case 'Manajemen Psikolog':
       renderedContent = <ManajemenPsikolog />;
       break;
-    case 'Manajemen Pengguna':
+    case 'Manajemen Pasien':
       renderedContent = <ManajemenPengguna />;
       break;
     case 'Laporan':

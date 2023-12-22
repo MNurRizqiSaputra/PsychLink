@@ -4,7 +4,7 @@ function SidebarAdmin({ onMenuClick }) {
   const menuItems = [
     { label: 'Beranda', icon: 'fas fa-home' },
     { label: 'Manajemen Psikolog', icon: 'fas fa-user-md' },
-    { label: 'Manajemen Pengguna', icon: 'fas fa-users' },
+    { label: 'Manajemen Pasien', icon: 'fas fa-users' },
     { label: 'Laporan', icon: 'fas fa-file-alt' },
     { label: 'Bantuan', icon: 'fas fa-question-circle' },
   ];

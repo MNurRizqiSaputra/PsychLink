@@ -116,6 +116,28 @@ function BerandaPasien() {
           </div>
           {/* /Card Riwayat Konsultasi */}
 
+          {/* Card Artikel */}
+          <div className="w-full p-6 md:w-1/2 xl:w-1/3">
+            <div
+              className="p-5 border-b-4 border-orange-500 rounded-lg shadow-xl bg-gradient-to-b from-orange-200 to-orange-100"
+            >
+              <div className="flex flex-row items-center">
+                <div className="flex-shrink pr-4">
+                  <div className="p-5 bg-orange-600 rounded-full">
+                    <i className="fas fa-newspaper fa-2x fa-inverse"></i>
+                  </div>
+                </div>
+                <div className="flex-1 text-right md:text-center">
+                  <h2 className="font-bold text-gray-600 uppercase">
+                    Artikel
+                  </h2>
+                  {/* Isi dengan data dinamis jika diperlukan */}
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* /Card Riwayat Konsultasi */}
+
           {/* Card Profil */}
           <div className="w-full p-6 md:w-1/2 xl:w-1/3">
             <div

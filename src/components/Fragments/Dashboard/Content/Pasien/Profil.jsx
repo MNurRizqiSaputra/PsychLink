@@ -12,21 +12,21 @@ function ProfilPasien() {
   return (
     <div className="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-14">
       <div className="flex items-center gap-4">
-        <div className="h-32 w-32 rounded-full border-4 border-blue-800">
+        <div className="w-32 h-32 border-4 border-blue-800 rounded-full">
           <img
             src={data.image}
             alt="profil"
-            className="object-cover h-full w-full rounded-full"
+            className="object-cover w-full h-full rounded-full"
           />
         </div>
         <div className="flex flex-col">
-          <h2 className="font-bold text-4xl">{data.nama}</h2>
-          <p className="font-semibold text-lg">{data.email}</p>
+          <h2 className="text-4xl font-bold">{data.nama}</h2>
+          <p className="text-lg font-semibold">{data.email}</p>
         </div>
       </div>
       <div className="mt-4">
-        <h2 className="font-bold text-xl">Detail data diri</h2>
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 border">
+        <h2 className="text-xl font-bold">Detail data diri</h2>
+        <table className="w-full text-sm text-left text-gray-500 border rtl:text-right">
           <tbody>
             <tr>
               <td className="px-6 py-4 whitespace-nowrap">Jenis Kelamin</td>

@@ -9,6 +9,7 @@ function FormRegister() {
     username: "",
     email: "",
     password: "",
+    token: "",
   });
 
   const [nextId, setNextId] = useState(null);

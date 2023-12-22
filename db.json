@@ -2,24 +2,28 @@
   "users": [
     {
       "id": 1,
-      "username": "pasien",
-      "email": "pasien@gmail.com",
-      "password": "pasien123",
-      "role": "pasien"
-    },
-    {
-      "id": 2,
-      "username": "psikolog",
-      "email": "psikolog@gmail.com",
-      "password": "psikolog123",
-      "role": "psikolog"
-    },
-    {
-      "id": 3,
       "username": "admin",
       "email": "admin@gmail.com",
       "password": "admin123",
-      "role": "admin"
+      "role": "admin",
+      "token": ""
+    },
+    {
+      "id": 2,
+      "username": "Dr. Budi",
+      "email": "budi@gmail.com",
+      "password": "drbudi123",
+      "role": "psikolog",
+      "spesialisasi": "Psikologi Klinis",
+      "token": ""
+    },
+    {
+      "id": 3,
+      "username": "Rizqi",
+      "email": "rizqi@gmail.com",
+      "password": "rizqi123",
+      "role": "pasien",
+      "token": ""
     },
     {
       "username": "putra",
@@ -29,11 +33,37 @@
       "id": 4
     },
     {
-      "username": "rizqi",
-      "email": "rizqi@gmail.com",
+      "username": "iqi",
+      "email": "iqi@gmail.com",
       "password": "123",
+      "token": "",
       "role": "pasien",
       "id": 5
+    }
+  ],
+  "konsultasis": [
+    {
+      "id": 1,
+      "pasienId": 3,
+      "psikologId": 2,
+      "tanggal": "2023-01-01",
+      "jam": "14:00",
+      "keluhan": "Stress",
+      "status": "Menunggu",
+      "linkGoogleMeet": "",
+      "feedback": ""
+    }
+  ],
+  "riwayatKonsultasis": [
+    {
+      "id": 1,
+      "pasienId": 3,
+      "psikologId": 2,
+      "tanggal": "2023-01-01",
+      "jam": "14:00",
+      "keluhan": "Stress",
+      "linkGoogleMeet": "https://meet.google.com/...",
+      "status": "Disetujui"
     }
   ]
 }

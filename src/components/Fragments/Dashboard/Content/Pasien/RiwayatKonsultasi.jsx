@@ -1,20 +1,33 @@
+import React, { useState } from "react";
+import DataTable from "react-data-table-component";
+
 function RiwayatKonsultasiPasien() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleFilter = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   const tableHead = [
     {
       name: "Tanggal Konsultasi",
-      key: "tanggal",
+      selector: "tanggal",
+      sortable: true,
     },
     {
       name: "Jam Konsultasi",
-      key: "jam",
+      selector: "jam",
+      sortable: true,
     },
     {
-      name: "Nama Psikolog",
-      key: "nama",
+      name: "Nama Psikolog (Username)",
+      selector: "nama",
+      sortable: true,
     },
     {
       name: "Status",
-      key: "status",
+      cell: (row) => renderStatus(row.status),
+      sortable: true,
     },
   ];
 
@@ -22,31 +35,25 @@ function RiwayatKonsultasiPasien() {
     {
       tanggal: "12/12/2021",
       jam: "12.00",
-      nama: "Dr. Aji",
-      status: "Menunggu",
+      nama: "Dr. Aji (aji_psikolog)",
+      status: "Selesai",
     },
     {
       tanggal: "12/12/2021",
       jam: "12.00",
-      nama: "Dr. Budiman",
+      nama: "Dr. Budiman (budiman_psikolog)",
       status: "Disetujui",
     },
     {
       tanggal: "12/12/2021",
       jam: "12.00",
-      nama: "Dr. Cahya",
+      nama: "Dr. Cahya (cahya_psikolog)",
       status: "Selesai",
     },
   ];
 
   const renderStatus = (status) => {
     switch (status) {
-      case "Menunggu":
-        return (
-          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
-            {status}
-          </span>
-        );
       case "Disetujui":
         return (
           <span className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
@@ -60,41 +67,28 @@ function RiwayatKonsultasiPasien() {
           </span>
         );
       default:
-        return (
-          <span className="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
-            {status}
-          </span>
-        );
+        return null;
     }
   };
 
+  const filteredData = tableData.filter((row) =>
+    row.nama.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
-      <div className="relative overflow-x-auto">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
-            <tr>
-              {tableHead.map((head) => (
-                <th key={head.key} scope="col" className="px-6 py-3">
-                  {head.name}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.map((row) => (
-              <tr key={row.nama}>
-                <td className="px-6 py-4 whitespace-nowrap">{row.tanggal}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.jam}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.nama}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {renderStatus(row.status)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <input
+        className="col-start-1 block rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:border-0 focus:ring-indigo-400 sm:text-sm sm:leading-6 mr-2 mb-3"
+        type="text"
+        placeholder="Cari Nama Psikolog"
+        onChange={handleFilter}
+      />
+      <DataTable
+        title="Riwayat Konsultasi Pasien"
+        columns={tableHead}
+        data={filteredData}
+        pagination
+      />
     </div>
   );
 }

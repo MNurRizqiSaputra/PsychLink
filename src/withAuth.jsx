@@ -1,23 +1,28 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// withAuth.jsx
+import React from 'react';
+import { Navigate } from 'react-router-dom';
 
-const withAuth = (WrappedComponent) => {
-  const AuthenticatedComponent = (props) => {
-    const navigate = useNavigate();
+const withAuth = (WrappedComponent, allowedRoles) => {
+  return (props) => {
+    const user = JSON.parse(localStorage.getItem('user'));
 
-    // Check if the user is authenticated by inspecting local storage
-    const isAuthenticated = !!localStorage.getItem("user");
-
-    useEffect(() => {
-      if (!isAuthenticated) {
-        navigate("/login");
+    if (user && allowedRoles.includes(user.role)) {
+      return <WrappedComponent {...props} />;
+    } else {
+      // Redirect to the user's home page based on their role
+      switch (user.role) {
+        case 'pasien':
+          return <Navigate to="/homepasien" />;
+        case 'psikolog':
+          return <Navigate to="/homepsikolog" />;
+        case 'admin':
+          return <Navigate to="/homeadmin" />;
+        default:
+          // If user has no role or an invalid role, redirect to a default home page or handle it as appropriate
+          return <Navigate to="/" />;
       }
-    }, [isAuthenticated, navigate]);
-
-    return isAuthenticated ? <WrappedComponent {...props} /> : null;
+    }
   };
-
-  return (props) => <AuthenticatedComponent {...props} />;
 };
 
 export default withAuth;

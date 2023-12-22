@@ -11,9 +11,9 @@ import HomeAdmin from './pages/dahboard/admin/index.jsx'
 import HomePsikolog from './pages/dahboard/psikolog/index.jsx'
 import withAuth from './withAuth.jsx'
 
-const Authhomeadmin = withAuth(HomeAdmin);
-const Authhomepsikolog = withAuth(HomePsikolog);
-const Authhomepasien = withAuth(HomePasien);
+const Authhomeadmin = withAuth(HomeAdmin, ['admin']);
+const Authhomepsikolog = withAuth(HomePsikolog, ['psikolog']);
+const Authhomepasien = withAuth(HomePasien, ['pasien']);
 
 const router = createBrowserRouter([
   {
@@ -31,16 +31,16 @@ const router = createBrowserRouter([
   },
   {
     path: '/homepasien',
-    element : <Authhomepasien />
+    element: <Authhomepasien />,
   },
   {
     path: '/homeadmin',
-    element : <Authhomeadmin />
+    element: <Authhomeadmin />,
   },
   {
     path: '/homepsikolog',
-    element: <Authhomepsikolog />
-  }
+    element: <Authhomepsikolog />,
+  },
 ])
 
 

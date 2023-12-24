@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 
 function SidebarAdmin({ onMenuClick }) {
   const menuItems = [
-    { label: 'Beranda', icon: 'fas fa-home' },
-    { label: 'Manajemen Psikolog', icon: 'fas fa-user-md' },
-    { label: 'Manajemen Pengguna', icon: 'fas fa-users' },
-    { label: 'Laporan', icon: 'fas fa-file-alt' },
-    { label: 'Bantuan', icon: 'fas fa-question-circle' },
+    { label: "Beranda", icon: "fas fa-home" },
+    { label: "Manajemen Psikolog", icon: "fas fa-user-md" },
+    { label: "Manajemen Pasien", icon: "fas fa-users" },
+    { label: "Profil", icon: "fas fa-user" },
+    { label: "Bantuan", icon: "fas fa-question-circle" },
   ];
 
   return (
@@ -15,10 +15,12 @@ function SidebarAdmin({ onMenuClick }) {
         <div className="md:mt-12 md:w-48 md:fixed md:left-0 md:top-0 content-center md:content-start text-left justify-between">
           <ul className="list-reset flex flex-row md:flex-col pt-3 md:py-3 px-1 md:px-2 text-center md:text-left">
             {menuItems.map((item, index) => (
-              <li key={index} className="mr-3 flex-1" onClick={() => onMenuClick(item.label)}>
-                <a
-                  className="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"
-                >
+              <li
+                key={index}
+                className="mr-3 flex-1"
+                onClick={() => onMenuClick(item.label)}
+              >
+                <a className="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500">
                   <i className={`${item.icon} mr-2`} /> {item.label}
                 </a>
               </li>

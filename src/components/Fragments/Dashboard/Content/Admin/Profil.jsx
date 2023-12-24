@@ -3,7 +3,7 @@ import { BiEdit } from "react-icons/bi";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-function ProfilPasien() {
+function ProfilAdmin() {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [dataUser, setDataUser] = useState({});
@@ -18,8 +18,7 @@ function ProfilPasien() {
   const getUserData = async () => {
     const res = await axios.get("http://localhost:3000/users");
     const filter = res.data.filter(
-      (user) =>
-        user.role === "pasien" && user.username === loggedInUser.username
+      (user) => user.role === "admin" && user.username === loggedInUser.username
     );
 
     const data = filter.map((user) => ({
@@ -107,4 +106,4 @@ function ProfilPasien() {
   );
 }
 
-export default ProfilPasien;
+export default ProfilAdmin;

@@ -6,6 +6,7 @@ import JadwalKonsultasiPasien from './JadwalKonsultasi';
 import RiwayatKonsultasiPasien from './RiwayatKonsultasi';
 import ProfilPasien from './Profil';
 import BantuanPasien from './Bantuan';
+import ArtikelPasien from './Artikel';
 
 const Content = ({ selectedMenu }) => {
     let renderedContent = null;
@@ -23,6 +24,9 @@ const Content = ({ selectedMenu }) => {
         case 'Riwayat Konsultasi':
             renderedContent = <RiwayatKonsultasiPasien />;
             break;
+        case 'Artikel':
+            renderedContent = <ArtikelPasien />;
+            break;
         case 'Profil':
             renderedContent = <ProfilPasien />;
             break;
@@ -37,8 +41,8 @@ const Content = ({ selectedMenu }) => {
                     <div className="max-w-xl mb-5 md:mx-auto sm:text-center lg:max-w-2xl">
                         <div className="mb-4">
 
-                            <h1 className='text-3xl font-bold text-white bg-red-500 text-center'>Selamat Datang</h1>
-                            <h1 className='text-3xl font-bold text-red-500 text-center'>Pasien</h1>
+                            <h1 className='text-3xl font-bold text-center text-white bg-red-500'>Selamat Datang</h1>
+                            <h1 className='text-3xl font-bold text-center text-red-500'>Pasien</h1>
                         </div>
 
                     </div>

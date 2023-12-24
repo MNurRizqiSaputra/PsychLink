@@ -6,88 +6,154 @@ import axios from "axios";
 function DaftarPsikologPasien() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [psikologData, setPsikologData] = useState([]);
 
   useEffect(() => {
-    // Retrieve the username of the logged-in user from local storage
-    const storedUsername = localStorage.getItem("username");
-
-    // Fetch user data from the JSON file using Axios
-    axios.get("http://localhost:3000/users") // Adjust the endpoint to your server
-      .then((response) => {
-        console.log("Fetched Data:", response.data);
-
-        // Find the logged-in user from the fetched data
-        const user = response.data.find((user) => user.username === storedUsername);
-        console.log("Logged In User:", user);
-
-        // Set the logged-in user to state
-        setLoggedInUser(user);
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-      });
+    // Retrieve the user data JSON string from local storage
+    const storedUserDataString = localStorage.getItem("user");
+  
+    if (!storedUserDataString) {
+      // Handle the case where the user data is not found in local storage
+      console.error("User data not found in local storage.");
+      return;
+    }
+  
+    try {
+      // Parse the JSON string into a JavaScript object
+      const storedUserData = JSON.parse(storedUserDataString);
+  
+      // Fetch user data from the JSON file using Axios
+      axios.get("http://localhost:3000/users")
+        .then((response) => {
+          console.log("Fetched Data:", response.data);
+  
+          // Find the logged-in user from the fetched data
+          const user = response.data.find((userData) => userData.id === storedUserData.id);
+  
+          if (!user) {
+            // Handle the case where the user is not found
+            console.error("Logged-in user not found in the fetched data.");
+            return;
+          }
+  
+          // Set the logged-in user to state
+          setLoggedInUser(user);
+  
+          // Filter psikolog data from fetched users
+          const psikologs = response.data.filter((userData) => userData.role === "psikolog");
+          setPsikologData(psikologs);
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+    } catch (error) {
+      // Handle the case where JSON parsing fails
+      console.error("Error parsing user data from local storage:", error);
+    }
   }, []);
+  
 
   const handleFilter = (e) => {
     setSearchTerm(e.target.value);
   };
 
   const handleConsultation = (row) => {
-    Swal.fire({
-      title: `Ajukan Konsultasi dengan ${row.nama}`,
-      html: `
-        <div class="bg-white p-4 rounded-md shadow-md">
-          <div class="mb-4">
-            <label for="namaPasien" class="block text-sm font-medium text-gray-700">Nama Pasien:</label>
-            <input type="text" id="namaPasien" name="namaPasien" value="${loggedInUser ? loggedInUser.username : ''}" class="mt-1 p-2 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" readonly>
-          </div>
-
-          <form>
-            <div class="mb-4">
-              <label for="tanggal" class="block text-sm font-medium text-gray-700">Tanggal:</label>
-              <input type="date" id="tanggal" name="tanggal" class="mt-1 p-2 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-            </div>
-
-            <div class="mb-4">
-              <label for="jam" class="block text-sm font-medium text-gray-700">Jam:</label>
-              <input type="time" id="jam" name="jam" class="mt-1 p-2 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-            </div>
-
-            <div class="mb-4">
-              <label for="keluhan" class="block text-sm font-medium text-gray-700">Keluhan:</label>
-              <textarea id="keluhan" name="keluhan" rows="4" class="mt-1 p-2 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required></textarea>
-            </div>
-          </form>
-        </div>
-      `,
-      showCancelButton: true,
-      confirmButtonText: "Ajukan Konsul",
-      cancelButtonText: "Batal",
-      preConfirm: () => {
-        // Handle form submission here
-        const tanggal = Swal.getPopup().querySelector("#tanggal").value;
-        const jam = Swal.getPopup().querySelector("#jam").value;
-        const keluhan = Swal.getPopup().querySelector("#keluhan").value;
-
-        // Perform the necessary actions with the form data
-        console.log("Nama Pasien:", loggedInUser ? loggedInUser.username : '');
-        console.log("Tanggal:", tanggal);
-        console.log("Jam:", jam);
-        console.log("Keluhan:", keluhan);
-
-        // For now, just show a success message
+    axios.get("http://localhost:3000/konsultasis")
+      .then((response) => {
+        const existingConsultations = response.data;
+        
+        // Find the next available consultation ID
+        const newConsultationId = existingConsultations.length > 0
+          ? Math.max(...existingConsultations.map((consultation) => consultation.id)) + 1
+          : 1;
+  
         Swal.fire({
-          title: "Konsultasi Diajukan!",
-          icon: "success",
+          title: `Ajukan Konsultasi dengan ${row.username}`,
+          html: `
+            <div class="bg-white p-4 rounded-md shadow-md">
+              <form>
+                <div class="mb-4">
+                  <label for="tanggal" class="block text-sm font-medium text-gray-700">Tanggal Konsultasi:</label>
+                  <input type="date" id="tanggal" name="tanggal" class="mt-1 p-2 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                </div>
+    
+                <div class="mb-4">
+                  <label for="jam" class="block text-sm font-medium text-gray-700">Jam Konsultasi:</label>
+                  <input type="time" id="jam" name="jam" class="mt-1 p-2 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                </div>
+    
+                <div class="mb-4">
+                  <label for="keluhan" class="block text-sm font-medium text-gray-700">Keluhan:</label>
+                  <textarea id="keluhan" name="keluhan" rows="4" class="mt-1 p-2 block w-full rounded-md border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required></textarea>
+                </div>
+              </form>
+            </div>
+          `,
+          showCancelButton: true,
+          confirmButtonText: "Ajukan Konsul",
+          cancelButtonText: "Batal",
+          preConfirm: () => {
+            const tanggal = Swal.getPopup().querySelector("#tanggal").value;
+            const jam = Swal.getPopup().querySelector("#jam").value;
+            const keluhan = Swal.getPopup().querySelector("#keluhan").value;
+    
+            const errors = {};
+    
+            if (!tanggal || !jam || !keluhan) {
+              errors.general = "Pastikan semua data konsultasi terisi";
+            }
+    
+            if (Object.keys(errors).length > 0) {
+              Swal.showValidationMessage(Object.values(errors).join("<br>"));
+              return false; // Prevent the form from being submitted
+            }
+    
+            const newConsultation = {
+              id: newConsultationId,
+              pasienId: loggedInUser.id,
+              psikologId: row.id,
+              tanggal,
+              jam,
+              keluhan,
+              status: "Menunggu",
+              linkGoogleMeet: "",
+            };
+    
+            axios.post("http://localhost:3000/konsultasis", newConsultation)
+              .then((response) => {
+                console.log("Consultation Submitted:", response.data);
+    
+                axios.get("http://localhost:3000/users")
+                  .then((response) => {
+                    const psikologs = response.data.filter((user) => user.role === "psikolog");
+                    setPsikologData(psikologs);
+                  })
+                  .catch((error) => {
+                    console.error("Error fetching updated user data:", error);
+                  });
+    
+                Swal.fire({
+                  title: "Konsultasi Diajukan!",
+                  icon: "success",
+                });
+              })
+              .catch((error) => {
+                console.error("Error submitting consultation:", error);
+              });
+          },
         });
-      },
-    });
+      })
+      .catch((error) => {
+        console.error("Error fetching existing consultations:", error);
+      });
   };
+  
+  
 
   const tableHead = [
     {
       name: "Nama Psikolog",
-      selector: "nama",
+      selector: "username",
       sortable: true,
     },
     {
@@ -96,20 +162,11 @@ function DaftarPsikologPasien() {
       sortable: true,
     },
     {
-      name: "Status",
-      selector: "status",
-      sortable: true,
-    },
-    {
       name: "Aksi",
       cell: (row) => (
         <button
-          disabled={row.status !== "Tersedia"}
           onClick={() => handleConsultation(row)}
-          className={`bg-green-500 hover:bg-green-700 transition-colors text-white font-bold py-2 px-4 rounded ${
-            row.status !== "Tersedia" &&
-            "bg-opacity-50 cursor-not-allowed hover:bg-green-500/50"
-          }`}
+          className="px-4 py-2 font-bold text-white transition-colors bg-green-500 rounded hover:bg-green-700"
         >
           Konsultasi
         </button>
@@ -117,29 +174,8 @@ function DaftarPsikologPasien() {
     },
   ];
 
-  const tableData = [
-    {
-      nama: "Dr. Aji",
-      jenisKelamin: "Laki-laki",
-      spesialisasi: "Psikolog Anak",
-      status: "Tersedia",
-    },
-    {
-      nama: "Dr. Budiman",
-      jenisKelamin: "Laki-laki",
-      spesialisasi: "Psikolog Remaja",
-      status: "Tersedia",
-    },
-    {
-      nama: "Dr. Cahya",
-      jenisKelamin: "Perempuan",
-      spesialisasi: "Psikolog Dewasa",
-      status: "Tidak Tersedia",
-    },
-  ];
-
-  const filteredData = tableData.filter((row) =>
-    row.nama.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredData = psikologData.filter((row) =>
+    row.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (

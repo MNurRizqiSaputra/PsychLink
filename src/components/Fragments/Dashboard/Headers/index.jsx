@@ -13,14 +13,17 @@ function Header() {
   }
 
   // Fungsi untuk melakukan logout
-  function handleLogout() {
-    // Hapus informasi pengguna dari local storage
-    localStorage.removeItem("user");
-    // Hapus informasi pengguna dari state
-    setUser(null);
-    // Redirect ke halaman login
-    window.location.href = "/";
-  }
+  // Fungsi untuk melakukan logout
+function handleLogout() {
+  // Hapus informasi pengguna dari local storage
+  localStorage.removeItem("user");
+  // Hapus informasi konsultasis dari local storage (ganti "konsultasis" dengan nama key yang sesuai)
+  localStorage.removeItem("konsultasis");
+  // Hapus informasi pengguna dari state
+  setUser(null);
+  // Redirect ke halaman login
+  window.location.href = "/";
+}
 
   return (
     <header>

@@ -1,6 +1,7 @@
 // FormRegister.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 import InputForm from "../../Elements/Input";
 import Button from "../../Elements/Button";
 
@@ -9,7 +10,6 @@ function FormRegister() {
     username: "",
     email: "",
     password: "",
-    token: "",
   });
 
   const [nextId, setNextId] = useState(null);
@@ -42,6 +42,17 @@ function FormRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validasi input form
+    if (!formData.username || !formData.email || !formData.password) {
+      // Tampilkan pesan SweetAlert2 untuk input yang kosong
+      Swal.fire({
+        icon: 'error',
+        title: 'Kolom Kosong',
+        text: 'Harap isi semua kolom.',
+      });
+      return;
+    }
+
     try {
       // Set data pengguna baru termasuk id
       const newUserData = { ...formData, role: "pasien", id: nextId };
@@ -54,10 +65,24 @@ function FormRegister() {
       // Kirim data ke db.json
       await axios.post("http://localhost:3000/users", newUserData);
 
-      // Redirect atau tampilkan pesan sukses
+      // Tampilkan pesan sukses menggunakan SweetAlert2
+      await Swal.fire({
+        icon: 'success',
+        title: 'Registrasi Berhasil',
+        text: 'Anda telah berhasil terdaftar!',
+      });
+
+      // Redirect atau navigasi ke halaman login
       window.location.href = "/login"; // Ganti dengan halaman yang sesuai
     } catch (error) {
       console.error("Error:", error);
+
+      // Tampilkan pesan error menggunakan SweetAlert2
+      await Swal.fire({
+        icon: 'error',
+        title: 'Registrasi Gagal',
+        text: 'Terjadi kesalahan saat registrasi. Silakan coba lagi.',
+      });
       // Handle error, misalnya tampilkan pesan kesalahan
     }
   };

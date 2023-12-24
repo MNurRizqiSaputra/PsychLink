@@ -1,19 +1,97 @@
 {
-  "posts": [
+  "users": [
     {
       "id": 1,
-      "title": "json-server",
-      "author": "typicode"
+      "username": "admin",
+      "email": "admin@gmail.com",
+      "password": "admin123",
+      "role": "admin",
+      "token": ""
+    },
+    {
+      "id": 2,
+      "username": "Dr. Budi",
+      "email": "budi@gmail.com",
+      "password": "drbudi123",
+      "role": "psikolog",
+      "spesialisasi": "Psikologi Klinis",
+      "token": ""
+    },
+    {
+      "id": 3,
+      "username": "Rizqi",
+      "email": "rizqi@gmail.com",
+      "password": "rizqi123",
+      "role": "pasien",
+      "token": ""
+    },
+    {
+      "username": "putra",
+      "email": "putra@gmail.com",
+      "password": "123",
+      "role": "pasien",
+      "id": 4
+    },
+    {
+      "username": "iqi",
+      "email": "iqi@gmail.com",
+      "password": "123",
+      "token": "",
+      "role": "pasien",
+      "id": 5
+    },
+    {
+      "username": "test1",
+      "email": "test1@gmail.com",
+      "password": "test1234",
+      "role": "pasien",
+      "id": 6
+    },
+    {
+      "username": "test2",
+      "email": "test2@gmail.com",
+      "password": "test234",
+      "role": "pasien",
+      "id": 7
+    },
+    {
+      "username": "psikolog",
+      "email": "psikolog@gmail.com",
+      "password": "psikolog123",
+      "role": "psikolog",
+      "id": 8
+    },
+    {
+      "username": "nur",
+      "email": "nur@gmail.com",
+      "password": "nur123",
+      "role": "psikolog",
+      "id": 9
     }
   ],
-  "comments": [
+  "konsultasis": [
     {
       "id": 1,
-      "body": "some comment",
-      "postId": 1
+      "pasienId": 3,
+      "psikologId": 2,
+      "tanggal": "2023-01-01",
+      "jam": "14:00",
+      "keluhan": "Stress",
+      "status": "Menunggu",
+      "linkGoogleMeet": "",
+      "feedback": ""
     }
   ],
-  "profile": {
-    "name": "typicode"
-  }
+  "riwayatKonsultasis": [
+    {
+      "id": 1,
+      "pasienId": 3,
+      "psikologId": 2,
+      "tanggal": "2023-01-01",
+      "jam": "14:00",
+      "keluhan": "Stress",
+      "linkGoogleMeet": "https://meet.google.com/...",
+      "status": "Disetujui"
+    }
+  ]
 }

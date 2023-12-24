@@ -5,8 +5,7 @@ function SidebarAdmin({ onMenuClick }) {
     { label: "Beranda", icon: "fas fa-home" },
     { label: "Manajemen Psikolog", icon: "fas fa-user-md" },
     { label: "Manajemen Pasien", icon: "fas fa-users" },
-    { label: "Profil", icon: "fas fa-user" },
-    { label: "Bantuan", icon: "fas fa-question-circle" },
+    { label: "Profil", icon: "fas fa-user" }
   ];
 
   return (
@@ -21,7 +20,13 @@ function SidebarAdmin({ onMenuClick }) {
                 onClick={() => onMenuClick(item.label)}
               >
                 <a className="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500">
-                  <i className={`${item.icon} mr-2`} /> {item.label}
+                  {/* Hanya tampilkan ikon di bawah lebar tertentu */}
+                  <span className="hidden md:inline">
+                    <i className={`${item.icon} mr-2`} /> {item.label}
+                  </span>
+                  <span className="md:hidden">
+                    <i className={`${item.icon} mr-2`} />
+                  </span>
                 </a>
               </li>
             ))}

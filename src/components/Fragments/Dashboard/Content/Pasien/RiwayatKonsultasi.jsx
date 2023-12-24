@@ -1,11 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 function RiwayatKonsultasiPasien() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [konsultasiData, setKonsultasiData] = useState([]);
+  const [userData, setUserData] = useState([]);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    setLoggedInUser(storedUser);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const konsultasiResponse = await axios.get("http://localhost:3000/konsultasis");
+        const userDataResponse = await axios.get("http://localhost:3000/users");
+
+        setKonsultasiData(konsultasiResponse.data);
+        setUserData(userDataResponse.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleFilter = (e) => {
     setSearchTerm(e.target.value);
+  };
+
+  const getUserNameById = (userId) => {
+    const user = userData.find((user) => user.id === userId);
+    return user ? user.username : "Unknown User";
   };
 
   const tableHead = [
@@ -20,9 +51,23 @@ function RiwayatKonsultasiPasien() {
       sortable: true,
     },
     {
-      name: "Nama Psikolog (Username)",
-      selector: "nama",
+      name: "Nama Psikolog",
+      selector: "psikologId",
+      cell: (row) => getUserNameById(row.psikologId),
       sortable: true,
+    },
+    {
+      name: "Keluhan",
+      selector: "keluhan",
+      sortable: true,
+      grow: 2, // Adjust the value based on your layout and preferences
+      wrap: true, // Wrap the content to the next line if it's too long
+    },
+    {
+      name: "Message",
+      selector: "status",
+      cell: (row) => renderMessage(row.status),
+      sortable: false,
     },
     {
       name: "Status",
@@ -31,48 +76,54 @@ function RiwayatKonsultasiPasien() {
     },
   ];
 
-  const tableData = [
-    {
-      tanggal: "12/12/2021",
-      jam: "12.00",
-      nama: "Dr. Aji (aji_psikolog)",
-      status: "Selesai",
-    },
-    {
-      tanggal: "12/12/2021",
-      jam: "12.00",
-      nama: "Dr. Budiman (budiman_psikolog)",
-      status: "Disetujui",
-    },
-    {
-      tanggal: "12/12/2021",
-      jam: "12.00",
-      nama: "Dr. Cahya (cahya_psikolog)",
-      status: "Selesai",
-    },
-  ];
-
   const renderStatus = (status) => {
     switch (status) {
+      case "Menunggu":
+        return (
+          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+            {status}
+          </span>
+        );
       case "Disetujui":
         return (
           <span className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
             {status}
           </span>
         );
-      case "Selesai":
+      case "Ditolak":
         return (
           <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
             {status}
           </span>
         );
       default:
+        return (
+          <span className="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+            {status}
+          </span>
+        );
+    }
+  };
+
+  const renderMessage = (status) => {
+    switch (status) {
+      case "Menunggu":
+        return <span>Harap ditunggu, permintaan konsul anda sedang ditinjau</span>;
+      case "Disetujui":
+        return <span>Jangan lupa jadwal konsul Anda ya!</span>;
+      case "Ditolak":
+        return <span>Maaf konsul Anda ditolak oleh psikolog</span>;
+      case "Selesai":
+        return <span>Konsul Anda telah selesai, terima kasih</span>;
+      default:
         return null;
     }
   };
 
-  const filteredData = tableData.filter((row) =>
-    row.nama.toLowerCase().includes(searchTerm.toLowerCase())
+  const userConsultationData = konsultasiData.filter((row) => loggedInUser && row.pasienId === loggedInUser.id);
+
+  const filteredData = userConsultationData.filter((row) =>
+    getUserNameById(row.psikologId).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -83,12 +134,16 @@ function RiwayatKonsultasiPasien() {
         placeholder="Cari Nama Psikolog"
         onChange={handleFilter}
       />
-      <DataTable
-        title="Riwayat Konsultasi Pasien"
-        columns={tableHead}
-        data={filteredData}
-        pagination
-      />
+      {userConsultationData.length > 0 ? (
+        <DataTable
+          title="Riwayat Konsultasi Pasien"
+          columns={tableHead}
+          data={filteredData}
+          pagination
+        />
+      ) : (
+        <p className="text-center">Belum ada riwayat konsultasi</p>
+      )}
     </div>
   );
 }

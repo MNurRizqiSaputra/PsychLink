@@ -48,15 +48,19 @@ function ManajemenPengguna() {
     Swal.fire({
       title: "Mengedit Pasien",
       html:
-      '<p> Nama Pasien </p>' +
-      `<input id="namaPasien" class="w-3/4 swal2-input mt-2 mb-3 text-base" value=${findData.username}>` +
-      '<p> Email Pasien </p>' +
-      `<input id="emailPasien" class="w-3/4 swal2-input mt-2 mb-3 text-base" value=${findData.email}>` +
-      '<p> Password Pasien </p>' +
-      `<input id="passPasien" class="w-3/4 swal2-input mt-2 text-base" value=${findData.password}>`,
+        '<p> Nama Pasien </p>' +
+        `<input id="namaPasien" class="w-3/4 swal2-input mt-2 mb-3 text-base" value="${findData.username}">` +
+        '<p> Email Pasien </p>' +
+        `<input id="emailPasien" class="w-3/4 swal2-input mt-2 mb-3 text-base" value="${findData.email}">` +
+        '<p> Password Pasien </p>' +
+        `<input id="passPasien" class="w-3/4 swal2-input mt-2 text-base" value="${findData.password}">`,
       showCancelButton: true,
       preConfirm: () => {
-        if (document.getElementById("namaPasien").value == '' || document.getElementById("emailPasien").value == '' || document.getElementById("passPasien").value == '') {
+        if (
+          document.getElementById("namaPasien").value == "" ||
+          document.getElementById("emailPasien").value == "" ||
+          document.getElementById("passPasien").value == ""
+        ) {
           Swal.showValidationMessage("Pastikan nama dan email pasien terisi"); // Show error when validation fails.
         }
       },
@@ -65,11 +69,17 @@ function ManajemenPengguna() {
         const newName = document.getElementById("namaPasien").value;
         const newEmail = document.getElementById("emailPasien").value;
         const newPass = document.getElementById("passPasien").value;
-        
-        axios.put(`http://localhost:3000/users/${id}`, { 'username': newName, 'email': newEmail, 'password': newPass, 'role': 'pasien' })
-        .then(() => {
-          fetchUsers();
-        })
+  
+        axios
+          .put(`http://localhost:3000/users/${id}`, {
+            username: newName,
+            email: newEmail,
+            password: newPass,
+            role: "pasien",
+          })
+          .then(() => {
+            fetchUsers();
+          });
         Swal.fire("Saved!", "", "success");
       }
     });
@@ -104,33 +114,52 @@ function ManajemenPengguna() {
     Swal.fire({
       title: "Menambah Pasien",
       html:
-      '<p> Nama Pasien </p>' +
-      `<input id="namaPasien" class="w-3/4 swal2-input mt-2 mb-3 text-base" placeHolder="Masukkan nama pasien">` +
-      '<p> Email Pasien </p>' +
-      `<input id="emailPasien" class="w-3/4 swal2-input mt-2 mb-3 text-base" placeHolder="Masukkan email pasien">`+
-      '<p> Password Pasien </p>' +
-      `<input id="passPasien" class="w-3/4 swal2-input mt-2 text-base" placeHolder="Masukkan password pasien">`,
+        '<p> Nama Pasien </p>' +
+        `<input id="namaPasien" class="w-3/4 swal2-input mt-2 mb-3 text-base" placeHolder="Masukkan nama pasien">` +
+        '<p> Email Pasien </p>' +
+        `<input id="emailPasien" class="w-3/4 swal2-input mt-2 mb-3 text-base" placeHolder="Masukkan email pasien">` +
+        '<p> Password Pasien </p>' +
+        `<input id="passPasien" class="w-3/4 swal2-input mt-2 text-base" placeHolder="Masukkan password pasien">`,
       showCancelButton: true,
       preConfirm: () => {
-        if (document.getElementById("namaPasien").value == '' || document.getElementById("emailPasien").value == '' || document.getElementById("passPasien").value == '') {
-          Swal.showValidationMessage("Pastikan semua data pasien terisi"); // Show error when validation fails.
-          // Swal.enableConfirmButton(); // Enable the confirm button again.
+        const newName = document.getElementById("namaPasien").value;
+        const newEmail = document.getElementById("emailPasien").value;
+        const newPass = document.getElementById("passPasien").value;
+  
+        if (!newName || !newEmail || !newPass) {
+          Swal.showValidationMessage("Pastikan semua data pasien terisi");
+          return false; // Prevent the modal from closing if validation fails
         }
+  
+        if (!isValidEmail(newEmail)) {
+          Swal.showValidationMessage("Masukkan email yang valid");
+          return false; // Prevent the modal from closing if validation fails
+        }
+  
+        // If validation passes, continue with the API call
+        return true;
       },
     }).then((result) => {
       if (result.isConfirmed) {
         const newName = document.getElementById("namaPasien").value;
         const newEmail = document.getElementById("emailPasien").value;
         const newPass = document.getElementById("passPasien").value;
-
-        axios.post(`http://localhost:3000/users`, { 'username': newName, 'email': newEmail, 'password': newPass, 'role': 'pasien' })
-        .then(() => {
-          fetchUsers();
-        })
+  
+        axios
+          .post(`http://localhost:3000/users`, {
+            username: newName,
+            email: newEmail,
+            password: newPass,
+            role: "pasien",
+          })
+          .then(() => {
+            fetchUsers();
+          });
         Swal.fire("Saved!", "", "success");
       }
     });
   };
+  
 
   const columns = [
     {
@@ -144,30 +173,28 @@ function ManajemenPengguna() {
       sortable: true
     },
     {
-      name: 'Password',
-      selector: row => row.password,
+      name: "Password",
+      selector: (row) => '********',
       sortable: true
     },
     {
       name: 'Action',
       cell: (d) => [
         <button
-          key={d.id}
-          className="focus:outline-none text-white bg-sky-400 hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2"
-          onClick={() => {handleEditClick(d.id)}}
-        >
-          Edit
-        </button>,
-        <button
-          key={d.id}
-          className="focus:outline-none text-white bg-red-400 hover:bg-red-600 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2"
-          onClick={() => {handleDeleteClick(d.id)}}
-          // onClick={() => {
-          //   navigate(`/edit-buku/${d.id}`)
-          // }}
-        >
-          Hapus
-        </button>
+  key={d.id}
+  className="focus:outline-none text-white bg-sky-400 hover:bg-sky-600 focus:ring-4 focus:ring-sky-300 font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 mr-2 h-8 sm:h-10 w-16 sm:w-20"
+  onClick={() => {handleEditClick(d.id)}}
+>
+  Edit
+</button>,
+<button
+  key={d.id}
+  className="focus:outline-none text-white bg-red-400 hover:bg-red-600 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 mr-2 h-8 sm:h-10 w-16 sm:w-20"
+  onClick={() => {handleDeleteClick(d.id)}}
+>
+  Hapus
+</button>
+
       ]
     }
   ];

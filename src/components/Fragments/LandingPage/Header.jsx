@@ -1,5 +1,6 @@
 import React from 'react';
 import heroImage from '@assets/images/hero3.png';
+import { Link } from 'react-router-dom';
 
 const Headers = () => {
   return (
@@ -15,9 +16,9 @@ const Headers = () => {
             <p className="mb-8 text-2xl leading-normal">
               Solusi konsultasi mental mudah di tangan Anda. Temukan kesehatan mental yang lebih baik.
             </p>
-            <button className="px-8 py-4 mx-auto my-6 font-bold text-gray-800 transition duration-300 ease-in-out transform bg-white rounded-full shadow-lg lg:mx-0 hover:underline focus:outline-none focus:shadow-outline hover:scale-105">
+            <Link to="/login" className="px-8 py-4 mx-auto my-6 font-bold text-gray-800 transition duration-300 ease-in-out transform bg-white rounded-full shadow-lg lg:mx-0 hover:underline focus:outline-none focus:shadow-outline hover:scale-105">
               Mulai Konsultasi
-            </button>
+            </Link>
           </div>
           {/* Right Col */}
           <div className="w-full py-6 text-center md:w-3/5">

@@ -1,17 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 function RiwayatKonsultasiPsikolog() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [konsultasiData, setKonsultasiData] = useState([]);
+  const [userData, setUserData] = useState([]);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    setLoggedInUser(storedUser);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const konsultasiResponse = await axios.get("http://localhost:3000/konsultasis");
+        const userDataResponse = await axios.get("http://localhost:3000/users");
+
+        setKonsultasiData(konsultasiResponse.data);
+        setUserData(userDataResponse.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleFilter = (e) => {
     setSearchTerm(e.target.value);
   };
 
+  const getUserNameById = (userId) => {
+    const user = userData.find((user) => user.id === userId);
+    return user ? user.username : "Unknown User";
+  };
+
   const handleFinishConsultation = (row) => {
-    setSelectedRow(row);
     Swal.fire({
       title: "Selesaikan Konsultasi?",
       text: "Apakah Anda yakin ingin menyelesaikan konsultasi ini?",
@@ -28,21 +56,30 @@ function RiwayatKonsultasiPsikolog() {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        handleSetStatusSelesai();
+        handleSetStatusSelesai(row);
       }
     });
   };
 
-  const handleSetStatusSelesai = () => {
-    // Proses menyelesaikan konsultasi
-    // ...
-    Swal.fire({
-      icon: "success",
-      title: "Konsultasi Selesai",
-      text: "Konsultasi telah selesai.",
-    });
-    // Disini tambahkan logika untuk mengubah status konsultasi menjadi "Selesai"
-    // Misalnya: panggil fungsi atau kirim permintaan API untuk mengubah status
+  const handleSetStatusSelesai = async (row) => {
+    try {
+      // Update the status of the consultation in your data (call an API or modify db.json directly)
+      await axios.patch(`http://localhost:3000/konsultasis/${row.id}`, { status: "Selesai" });
+
+      // Update the local state if needed
+      const updatedKonsultasiData = konsultasiData.map((dataRow) =>
+        dataRow.id === row.id ? { ...dataRow, status: "Selesai" } : dataRow
+      );
+      setKonsultasiData(updatedKonsultasiData);
+
+      Swal.fire({
+        icon: "success",
+        title: "Konsultasi Selesai",
+        text: "Konsultasi telah selesai.",
+      });
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   };
 
   const tableHead = [
@@ -57,87 +94,154 @@ function RiwayatKonsultasiPsikolog() {
       sortable: true,
     },
     {
-      name: "Nama Pasien (Username)",
-      selector: "nama",
+      name: "Nama Pasien",
+      selector: "pasienId",
+      cell: (row) => getUserNameById(row.pasienId),
       sortable: true,
     },
     {
       name: "Keluhan",
       selector: "keluhan",
       sortable: true,
-    },
-    {
-      name: "Link Google Meet",
-      selector: "link",
-      sortable: true,
-      cell: (row) => renderLinkCell(row.link),
+      grow: 2, // Adjust the value based on your layout and preferences
+      wrap: true, // Wrap the content to the next line if it's too long
     },
     {
       name: "Status",
-      selector: "status",
+      cell: (row) => renderStatus(row.status),
       sortable: true,
+    },
+    {
+      name: "Link Google Meet",
+      cell: (row) => renderGoogleMeetLink(row.linkGoogleMeet, row.status),
+      sortable: false,
     },
     {
       name: "Action",
       cell: (row) => renderAction(row),
-    },
+      sortable: false,
+    }
   ];
 
-  const tableData = [
-    {
-      tanggal: "12/12/2021",
-      jam: "12.00",
-      nama: "Pasien A (pasienA)",
-      keluhan: "Stress",
-      link: "https://meet.google.com/xyz",
-      status: "Disetujui",
-    },
-    {
-      tanggal: "12/12/2021",
-      jam: "12.00",
-      nama: "Pasien B (pasienB)",
-      keluhan: "Kecemasan",
-      link: "https://meet.google.com/abc",
-      status: "Selesai",
-    },
-    {
-      tanggal: "12/12/2021",
-      jam: "12.00",
-      nama: "Pasien C (pasienC)",
-      keluhan: "Depresi",
-      link: "https://meet.google.com/pqr",
-      status: "Disetujui",
-    },
-  ];
-
-  const renderLinkCell = (link) => (
-    <div style={{ whiteSpace: "pre-wrap" }}>{link}</div>
-  );
-
-  const renderAction = (row) => {
-    switch (row.status) {
+  const renderStatus = (status) => {
+    switch (status) {
+      case "Menunggu":
+        return (
+          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+            {status}
+          </span>
+        );
       case "Disetujui":
         return (
-          <button
-            onClick={() => handleFinishConsultation(row)}
-            className="px-4 py-2 text-white bg-blue-500 rounded"
-          >
-            Klik untuk Selesai
-          </button>
+          <span className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+            {status}
+          </span>
+        );
+      case "Ditolak":
+        return (
+          <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+            {status}
+          </span>
         );
       case "Selesai":
         return (
-          <button className="px-4 py-2 text-gray-600 bg-gray-300 rounded" disabled>
-            Klik untuk Selesai
-          </button>
+          <span className="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+            {status}
+          </span>
         );
       default:
-        return null;
+        return (
+          <span className="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded">
+            {status}
+          </span>
+        );
     }
   };
 
-  const filteredData = tableData.filter((row) =>
-    row.nama.toLowerCase().includes(searchTerm.toLowerCase())
+  const renderGoogleMeetLink = (linkGoogleMeet, status) => {
+    if (linkGoogleMeet && status !== "Selesai") {
+      return (
+        <button
+          onClick={() => handleViewGoogleMeetLink(linkGoogleMeet)}
+          className="px-3 py-1.5 text-white bg-green-500 rounded text-xs sm:text-sm"
+        >
+          Link Google Meet
+        </button>
+      );
+    } else {
+      return (
+        <span className="text-gray-500">Link not available</span>
+      );
+    }
+  };
+
+  const handleViewGoogleMeetLink = (link) => {
+    // Use SweetAlert2 to show the Google Meet link
+    Swal.fire({
+      icon: "info",
+      title: "Google Meet Link",
+      html: `
+        <p class="mb-4">Link: <input id="linkInput" class="w-full p-2 border rounded text-center" type="text" value="${link}" readonly></p>
+        <button id="copyButton" class="bg-green-500 text-white px-4 py-2 rounded">Salin</button>
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Buka Link",
+      customClass: {
+        confirmButton: 'bg-blue-500 text-white px-4 py-2 rounded',
+        cancelButton: 'bg-gray-300 text-gray-600 px-4 py-2 rounded',
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.open(link, '_blank'); // Open link in a new tab
+      }
+    });
+  
+    // Attach event listener after the SweetAlert is opened
+    const copyButton = document.getElementById('copyButton');
+    copyButton.addEventListener('click', () => {
+      const inputField = document.getElementById('linkInput');
+  
+      // Select the text in the input field
+      inputField.select();
+      inputField.setSelectionRange(0, 99999); // For mobile devices
+  
+      // Copy the selected text to the clipboard
+      document.execCommand('copy');
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Link tersalin!',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    });
+  };
+  
+
+  const renderAction = (row) => {
+    if (row.status === "Disetujui" && row.status !== "Selesai") {
+      return (
+        <button
+          onClick={() => handleFinishConsultation(row)}
+          className="px-3 py-1.5 text-white bg-blue-500 rounded text-xs sm:text-sm"
+          disabled={row.status === "Menunggu" || row.status === "Selesai"}
+        >
+          Klik untuk Selesai
+        </button>
+      );
+    } else {
+      return (
+        <button className="px-3 py-1.5 text-gray-600 bg-gray-300 rounded text-xs sm:text-sm" disabled>
+          Klik untuk Selesai
+        </button>
+      );
+    }
+  };
+
+  const userConsultationData = konsultasiData.filter((row) => loggedInUser && row.psikologId === loggedInUser.id);
+
+  const filteredData = userConsultationData.filter((row) =>
+    getUserNameById(row.pasienId).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -148,12 +252,16 @@ function RiwayatKonsultasiPsikolog() {
         placeholder="Cari Nama Pasien"
         onChange={handleFilter}
       />
-      <DataTable
-        title="Riwayat Konsultasi Psikolog"
-        columns={tableHead}
-        data={filteredData}
-        pagination
-      />
+      {userConsultationData.length > 0 ? (
+        <DataTable
+          title="Riwayat Konsultasi Psikolog"
+          columns={tableHead}
+          data={filteredData}
+          pagination
+        />
+      ) : (
+        <p className="text-center">Belum ada riwayat konsultasi</p>
+      )}
     </div>
   );
 }

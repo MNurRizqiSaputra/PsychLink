@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BiEdit } from "react-icons/bi";
+import { BiEdit, BiUser, BiEnvelope, BiLock, BiUserCheck } from "react-icons/bi";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -24,6 +24,7 @@ const ProfilPsikolog = () => {
 
     const data = filter.map((user) => ({
       ...user,
+      role: "psikolog",
     }));
 
     setDataUser(data[0]);
@@ -43,8 +44,13 @@ const ProfilPsikolog = () => {
     image: `https://api.dicebear.com/7.x/lorelei-neutral/svg?seed=${dataUser.username}`,
   };
 
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  
   const handleEdit = async () => {
-    const { value: formValues } = await Swal.fire({
+    const { value: formValues, dismiss } = await Swal.fire({
       title: "Edit Profil",
       html: `<input id="swal-input1" class="swal2-input" placeholder="Nama" value="${
         dataUser.username || ""
@@ -52,67 +58,121 @@ const ProfilPsikolog = () => {
       <input id="swal-input2" class="swal2-input" placeholder="Email" value="${
         dataUser.email || ""
       }">
-      ${
-        dataUser.spesialisasi
-          ? `<input id="swal-input3" class="swal2-input" placeholder="Spesialisasi" value="${
-              dataUser.spesialisasi || ""
-            }">`
-          : ""
-      }
-      `,
+      <input id="swal-input3" class="swal2-input" placeholder="Spesialisasi" value="${
+        dataUser.spesialisasi || ""
+      }">
+      <input id="swal-input4" class="swal2-input" placeholder="Password" type="text" value="${
+        dataUser.password || ""
+      }">`,
       focusConfirm: false,
+      showCancelButton: true,
       preConfirm: () => {
-        return [
-          document.getElementById("swal-input1").value,
-          document.getElementById("swal-input2").value,
-          document.getElementById("swal-input3")?.value,
-        ];
+        const name = document.getElementById("swal-input1").value;
+        const email = document.getElementById("swal-input2").value;
+        const spesialisasi = document.getElementById("swal-input3").value;
+        const password = document.getElementById("swal-input4").value;
+  
+        if (!name || !email || !spesialisasi || !password) {
+          Swal.showValidationMessage("Pastikan semua data terisi");
+          return false;
+        }
+  
+        if (!isValidEmail(email)) {
+          Swal.showValidationMessage("Masukkan email yang valid");
+          return false;
+        }
+  
+        return [name, email, spesialisasi, password];
       },
     });
-
+  
     if (formValues) {
+      const [name, email, spesialisasi, password] = formValues;
       const data = {
-        username: formValues[0],
-        email: formValues[1],
-        spesialisasi: formValues[2],
+        username: name,
+        email: email,
+        spesialisasi: spesialisasi,
+        password: password,
       };
-
-      const res = await axios.patch(
-        `http://localhost:3000/users/${dataUser.id}`,
-        data
-      );
-      localStorage.setItem("user", JSON.stringify(res.data));
-      window.location.reload();
+  
+      try {
+        const res = await axios.patch(
+          `http://localhost:3000/users/${dataUser.id}`,
+          data
+        );
+  
+        localStorage.setItem("user", JSON.stringify(res.data));
+  
+        localStorage.removeItem("user");
+        setUserLoggedIn(false);
+  
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 500);
+      } catch (error) {
+        console.error("Error editing profile:", error);
+  
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Terjadi kesalahan saat mengubah data. Silakan coba lagi.",
+        });
+      }
+    } else if (dismiss === Swal.DismissReason.cancel) {
+      console.log("Editing canceled");
     }
-  };
+  };  
 
   return (
-    <div className="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-14">
-      <div className="flex items-center gap-4 border border-blue-950 w-md p-5 rounded-lg relative">
-        <div className="w-32 h-32 border-4 border-blue-800 rounded-full">
-          <img
-            src={data.image}
-            alt={`Foto profil ${dataUser.username || ""}`}
-            className="object-cover w-full h-full rounded-full"
-          />
+    <div className="flex items-center justify-center mt-8">
+      <div className="w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-lg">
+        <div className="flex items-center px-6 py-3 bg-gray-900 justify-center">
+          <BiUser size={20} className="text-white mr-2" />
+          <h1 className="text-lg font-semibold text-white">
+            {dataUser.role || ""}
+          </h1>
         </div>
-        <div className="flex flex-col ">
-          <h2 className="text-4xl font-bold">
-            Hello {dataUser.username || ""}
-          </h2>
-          <div className="flex gap-3">
-            <p className="text-lg font-semibold">{dataUser.email || ""}</p>
-            <p className="text-lg font-semibold">
-              {dataUser?.spesialisasi || ""}
-            </p>
+
+        <img
+          className="object-cover object-center w-full h-56"
+          src={data.image}
+          alt={`Foto profil ${dataUser.username || ""}`}
+        />
+
+        <div className="px-6 py-4 text-center">
+          <h1 className="text-xl font-semibold text-gray-800 bg-slate-200">
+            {dataUser.username || ""}
+          </h1>
+
+          <div className="mt-4">
+            <div className="flex items-center justify-center">
+              <BiUserCheck size={20} className="text-gray-500 mr-2" />
+              <p className=" text-gray-700 dark:text-gray-400">
+                Spesialisasi: {dataUser.spesialisasi || ""}
+              </p>
+            </div>
+            <div className="flex items-center justify-center">
+              <BiEnvelope size={20} className="text-gray-500 mr-2" />
+              <p className=" text-gray-700 dark:text-gray-400">{dataUser.email || ""}</p>
+            </div>
+
+            <div className="flex items-center justify-center">
+              <BiLock size={20} className="text-gray-500 mr-2" />
+              <p className=" text-gray-700 dark:text-gray-400">
+                Password: {dataUser.password || ""}
+              </p>
+            </div>
+
           </div>
+
+          <button
+            onClick={handleEdit}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition duration-300 w-full flex items-center justify-center"
+          >
+            <BiEdit size={20} className="mr-2" />
+            Edit Profil
+          </button>
         </div>
-        <button
-          onClick={handleEdit}
-          className="absolute top-0 right-0 p-2 text-blue-950 hover:text-blue-800"
-        >
-          <BiEdit size={24} />
-        </button>
       </div>
     </div>
   );

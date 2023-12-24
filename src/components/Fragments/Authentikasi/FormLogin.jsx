@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 import InputForm from "../../Elements/Input";
 import Button from "../../Elements/Button";
 
 function FormLogin() {
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (event) => {
@@ -15,9 +15,14 @@ function FormLogin() {
     const email = event.target.email.value;
     const password = event.target.password.value;
 
-    // Check if email and password are not empty
+    // Periksa apakah email dan password tidak kosong
     if (!email || !password) {
-      setError("Email and password are required");
+      // Tampilkan pesan SweetAlert2 untuk kolom yang kosong
+      Swal.fire({
+        icon: 'error',
+        title: 'Kolom Kosong',
+        text: 'Silakan masukkan email dan password.',
+      });
       return;
     }
 
@@ -28,30 +33,56 @@ function FormLogin() {
       const user = response.data[0];
 
       if (user) {
-        // Save user data to local storage
+        // Simpan data pengguna ke local storage
         localStorage.setItem("user", JSON.stringify(user));
 
-        // Redirect based on user role
+        // Redirect berdasarkan peran pengguna
         switch (user.role) {
           case "pasien":
+            // Tampilkan pesan sukses menggunakan SweetAlert2
+            await Swal.fire({
+              icon: 'success',
+              title: 'Login Berhasil',
+              text: 'Selamat datang kembali!',
+            });
             navigate("/homepasien");
             break;
           case "psikolog":
+            await Swal.fire({
+              icon: 'success',
+              title: 'Login Berhasil',
+              text: 'Selamat datang kembali!',
+            });
             navigate("/homepsikolog");
             break;
           case "admin":
+            await Swal.fire({
+              icon: 'success',
+              title: 'Login Berhasil',
+              text: 'Selamat datang kembali!',
+            });
             navigate("/homeadmin");
             break;
           default:
-            setError("Invalid user role");
+            setError("Peran pengguna tidak valid");
             break;
         }
       } else {
-        setError("Invalid email or password");
+        // Tampilkan pesan error menggunakan SweetAlert2
+        await Swal.fire({
+          icon: 'error',
+          title: 'Kredensial Tidak Valid',
+          text: 'Email atau password tidak valid. Silakan coba lagi.',
+        });
       }
     } catch (error) {
       console.error("Error fetching user data", error);
-      setError("Failed to log in. Please try again.");
+      // Tampilkan pesan error menggunakan SweetAlert2
+      await Swal.fire({
+        icon: 'error',
+        title: 'Login Gagal',
+        text: 'Gagal masuk. Silakan coba lagi.',
+      });
     } finally {
       setLoading(false);
     }
@@ -61,13 +92,12 @@ function FormLogin() {
     <form onSubmit={handleLogin}>
       <InputForm label="Email" name="email" type="email" placeholder="email" />
       <InputForm label="Password" name="password" type="password" placeholder="password" />
-      {error && <p className="text-red-500">{error}</p>}
       <Button
         className={`w-full px-4 py-2 mt-4 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
         type="submit"
         disabled={loading}
       >
-        {loading ? 'Logging in...' : 'Login'}
+        {loading ? 'Masuk...' : 'Masuk'}
       </Button>
     </form>
   );

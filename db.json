@@ -2,96 +2,96 @@
   "users": [
     {
       "id": 1,
-      "username": "admin",
+      "username": "admin1",
       "email": "admin@gmail.com",
-      "password": "admin123",
-      "role": "admin",
-      "token": ""
+      "password": "123",
+      "role": "admin"
     },
     {
-      "id": 2,
-      "username": "Dr. Budi",
-      "email": "budi@gmail.com",
-      "password": "drbudi123",
-      "role": "psikolog",
-      "spesialisasi": "Psikologi Klinis",
-      "token": ""
-    },
-    {
-      "id": 3,
-      "username": "Rizqi",
-      "email": "rizqi@gmail.com",
-      "password": "rizqi123",
-      "role": "pasien",
-      "token": ""
-    },
-    {
-      "username": "putra",
+      "username": "Muhammad Nur Rizqi Saputra",
       "email": "putra@gmail.com",
+      "password": "123",
+      "role": "pasien",
+      "id": 2
+    },
+    {
+      "username": "rizqi",
+      "email": "rizqi@gmail.com",
+      "password": "123",
+      "role": "pasien",
+      "id": 3
+    },
+    {
+      "username": "Nur Rizqi",
+      "email": "nur@gmail.com",
       "password": "123",
       "role": "pasien",
       "id": 4
     },
     {
-      "username": "iqi",
-      "email": "iqi@gmail.com",
+      "username": "Wardiani Priyanto, S. Psi., M.Psi.,",
+      "email": "wardiani@gmail.com",
       "password": "123",
-      "token": "",
-      "role": "pasien",
+      "role": "psikolog",
+      "spesialisasi": "Psikolog Klinis",
       "id": 5
     },
     {
-      "username": "test1",
-      "email": "test1@gmail.com",
-      "password": "test1234",
+      "username": "Rizqi Saputra",
+      "email": "saputra@gmail.com",
+      "password": "1234",
       "role": "pasien",
       "id": 6
     },
     {
-      "username": "test2",
-      "email": "test2@gmail.com",
-      "password": "test234",
-      "role": "pasien",
+      "username": "Budi Kurniawan, S.Psi., Psikolog",
+      "email": "budi@gmail.com",
+      "password": "123",
+      "role": "psikolog",
+      "spesialisasi": "Psikolog Anak",
       "id": 7
-    },
-    {
-      "username": "psikolog",
-      "email": "psikolog@gmail.com",
-      "password": "psikolog123",
-      "role": "psikolog",
-      "id": 8
-    },
-    {
-      "username": "nur",
-      "email": "nur@gmail.com",
-      "password": "nur123",
-      "role": "psikolog",
-      "id": 9
     }
   ],
   "konsultasis": [
     {
       "id": 1,
-      "pasienId": 3,
-      "psikologId": 2,
-      "tanggal": "2023-01-01",
-      "jam": "14:00",
-      "keluhan": "Stress",
-      "status": "Menunggu",
-      "linkGoogleMeet": "",
-      "feedback": ""
-    }
-  ],
-  "riwayatKonsultasis": [
+      "pasienId": 2,
+      "psikologId": 5,
+      "tanggal": "2023-12-25",
+      "jam": "19:00",
+      "keluhan": "Sering marah berlebihan dan sangat sensitif.",
+      "status": "Selesai",
+      "linkGoogleMeet": "https://meet.google.com/sqb-jrkq-vni"
+    },
     {
-      "id": 1,
+      "id": 2,
       "pasienId": 3,
-      "psikologId": 2,
-      "tanggal": "2023-01-01",
-      "jam": "14:00",
-      "keluhan": "Stress",
-      "linkGoogleMeet": "https://meet.google.com/...",
-      "status": "Disetujui"
+      "psikologId": 5,
+      "tanggal": "2023-02-05",
+      "jam": "13:40",
+      "keluhan": "Kadang Galau",
+      "status": "Disetujui",
+      "linkGoogleMeet": "https://meet.google.com/gfn-zzxp-kni"
+    },
+    {
+      "id": 3,
+      "pasienId": 4,
+      "psikologId": 5,
+      "tanggal": "2023-12-03",
+      "jam": "16:30",
+      "keluhan": "Tantrum sendiri",
+      "status": "Ditolak",
+      "linkGoogleMeet": ""
+    },
+    {
+      "id": 4,
+      "pasienId": 6,
+      "psikologId": 7,
+      "tanggal": "2023-12-07",
+      "jam": "23:34",
+      "keluhan": "Susah Tidur",
+      "status": "Menunggu",
+      "linkGoogleMeet": ""
     }
   ]
 }

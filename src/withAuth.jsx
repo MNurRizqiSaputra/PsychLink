@@ -8,6 +8,8 @@ const withAuth = (WrappedComponent, allowedRoles) => {
 
     if (user && allowedRoles.includes(user.role)) {
       return <WrappedComponent {...props} />;
+    } else if (!user) {
+      return <Navigate to="/" />;
     } else {
       // Redirect to the user's home page based on their role
       switch (user.role) {

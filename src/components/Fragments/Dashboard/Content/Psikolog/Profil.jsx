@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { BiEdit, BiUser, BiEnvelope, BiLock, BiUserCheck } from "react-icons/bi";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const ProfilPsikolog = () => {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [dataUser, setDataUser] = useState({});
+  const navigate = useNavigate();
 
   const getUserLoggedIn = async () => {
     const res = localStorage.getItem("user");
@@ -48,80 +50,89 @@ const ProfilPsikolog = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-  
+
   const handleEdit = async () => {
-    const { value: formValues, dismiss } = await Swal.fire({
-      title: "Edit Profil",
-      html: `<input id="swal-input1" class="swal2-input" placeholder="Nama" value="${
-        dataUser.username || ""
-      }">
-      <input id="swal-input2" class="swal2-input" placeholder="Email" value="${
-        dataUser.email || ""
-      }">
-      <input id="swal-input3" class="swal2-input" placeholder="Spesialisasi" value="${
-        dataUser.spesialisasi || ""
-      }">
-      <input id="swal-input4" class="swal2-input" placeholder="Password" type="text" value="${
-        dataUser.password || ""
-      }">`,
-      focusConfirm: false,
-      showCancelButton: true,
-      preConfirm: () => {
-        const name = document.getElementById("swal-input1").value;
-        const email = document.getElementById("swal-input2").value;
-        const spesialisasi = document.getElementById("swal-input3").value;
-        const password = document.getElementById("swal-input4").value;
-  
-        if (!name || !email || !spesialisasi || !password) {
-          Swal.showValidationMessage("Pastikan semua data terisi");
-          return false;
-        }
-  
-        if (!isValidEmail(email)) {
-          Swal.showValidationMessage("Masukkan email yang valid");
-          return false;
-        }
-  
-        return [name, email, spesialisasi, password];
-      },
-    });
-  
-    if (formValues) {
-      const [name, email, spesialisasi, password] = formValues;
-      const data = {
-        username: name,
-        email: email,
-        spesialisasi: spesialisasi,
-        password: password,
-      };
-  
-      try {
-        const res = await axios.patch(
-          `http://localhost:3000/users/${dataUser.id}`,
-          data
-        );
-  
-        localStorage.setItem("user", JSON.stringify(res.data));
-  
-        localStorage.removeItem("user");
-        setUserLoggedIn(false);
-  
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 500);
-      } catch (error) {
-        console.error("Error editing profile:", error);
-  
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Terjadi kesalahan saat mengubah data. Silakan coba lagi.",
+    try {
+      // Show Swal modal for editing profile
+      const { value: formValues, dismiss } = await Swal.fire({
+        title: "Edit Profil",
+        html: `<input id="swal-input1" class="swal2-input" placeholder="Nama" value="${
+          dataUser.username || ""
+        }">
+        <input id="swal-input2" class="swal2-input" placeholder="Email" value="${
+          dataUser.email || ""
+        }">
+        <input id="swal-input3" class="swal2-input" placeholder="Spesialisasi" value="${
+          dataUser.spesialisasi || ""
+        }">
+        <input id="swal-input4" class="swal2-input" placeholder="Password" type="text" value="${
+          dataUser.password || ""
+        }">`,
+        focusConfirm: false,
+        showCancelButton: true,
+        preConfirm: () => {
+          const name = document.getElementById("swal-input1").value;
+          const email = document.getElementById("swal-input2").value;
+          const spesialisasi = document.getElementById("swal-input3").value;
+          const password = document.getElementById("swal-input4").value;
+
+          if (!name || !email || !spesialisasi || !password) {
+            Swal.showValidationMessage("Pastikan semua data terisi");
+            return false;
+          }
+
+          if (!isValidEmail(email)) {
+            Swal.showValidationMessage("Masukkan email yang valid");
+            return false;
+          }
+
+          return [name, email, spesialisasi, password];
+        },
+      });
+
+      // Process formValues if not canceled
+      if (formValues) {
+        // Show SweetAlert2 konfirmasi menggunakan tombol "Ya, saya yakin" dan "Batal"
+        const confirmResult = await Swal.fire({
+          title: "Konfirmasi Edit Profil",
+          text: "Pastikan Anda sudah yakin untuk mengedit data Anda, karena sistem akan terlogout otomatis.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Ya, saya yakin",
+          cancelButtonText: "Batal",
+          reverseButtons: true,
         });
+
+        // Jika pengguna menekan tombol "Ya, saya yakin"
+        if (confirmResult.isConfirmed) {
+          const [name, email, spesialisasi, password] = formValues;
+          const data = {
+            username: name,
+            email: email,
+            spesialisasi: spesialisasi,
+            password: password,
+          };
+
+          await axios.patch(
+            `http://localhost:3000/users/${dataUser.id}`,
+            data
+          );
+          localStorage.setItem("user", JSON.stringify(data));
+
+          // Logout user
+          setUserLoggedIn(false);
+
+          // Redirect to "/login" using useNavigate
+          navigate("/login");
+        } else if (dismiss === Swal.DismissReason.cancel) {
+          // Handle cancel action here
+          console.log("Editing canceled");
+        }
       }
-    } else if (dismiss === Swal.DismissReason.cancel) {
-      console.log("Editing canceled");
+    } catch (error) {
+      console.error("Error editing profile:", error);
     }
-  };  
+  };
 
   return (
     <div className="flex items-center justify-center mt-8">

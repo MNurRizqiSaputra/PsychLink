@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import Logo from "../../../../assets/images/logo3.png";
 
 function Header() {
+  const navigate = useNavigate();
+
   // State untuk menyimpan informasi pengguna yang login
   const [user, setUser] = useState(getUserFromLocalStorage());
 
@@ -13,17 +16,29 @@ function Header() {
   }
 
   // Fungsi untuk melakukan logout
-  // Fungsi untuk melakukan logout
-function handleLogout() {
-  // Hapus informasi pengguna dari local storage
-  localStorage.removeItem("user");
-  // Hapus informasi konsultasis dari local storage (ganti "konsultasis" dengan nama key yang sesuai)
-  localStorage.removeItem("konsultasis");
-  // Hapus informasi pengguna dari state
-  setUser(null);
-  // Redirect ke halaman login
-  window.location.href = "/";
-}
+  function handleLogout() {
+    // Tampilkan notifikasi konfirmasi SweetAlert
+    Swal.fire({
+      title: "Logout",
+      text: "Apakah Anda yakin ingin logout?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, logout!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Hapus informasi pengguna dari local storage
+        localStorage.removeItem("user");
+        // Hapus informasi konsultasis dari local storage (ganti "konsultasis" dengan nama key yang sesuai)
+        localStorage.removeItem("konsultasis");
+        // Hapus informasi pengguna dari state
+        setUser(null);
+        // Redirect ke halaman login
+        navigate("/");
+      }
+    });
+  }
 
   return (
     <header>
@@ -34,11 +49,7 @@ function handleLogout() {
       >
         <div className="flex flex-wrap items-center">
           <div className="flex justify-center flex-shrink text-white md:w-1/3 md:justify-start">
-            <img
-              className="h-8 mr-2 rounded-full"
-              src={Logo}
-              alt="Profile"
-            />
+            <img className="h-8 mr-2 rounded-full" src={Logo} alt="Profile" />
           </div>
 
           <div className="flex justify-center md:w-1/3"></div>
@@ -59,29 +70,29 @@ function handleLogout() {
                 </div>
               </li>
 
-              <button className="mr-2 text-center border border-white border-rounded">
-                <li className="flex-1 md:flex-none md:mr-3">
-                  {/* Tampilkan tombol Logout jika pengguna login */}
-                  {user && (
-                    <div
-                      className="inline-block px-4 py-2 mr-2 text-center text-white"
-                      onClick={handleLogout}
-                    >
+              <button className="mr-2 text-center bg-red-500 hover:bg-red-700 rounded-full p-1">
+              <li className="flex-1 md:flex-none md:mr-3">
+                {/* Tampilkan tombol Logout jika pengguna login */}
+                {user && (
+                  <div
+                    className="inline-block px-4 py-2 mr-2 text-center text-white cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    <i className="mr-3 fas fa-sign-out-alt"></i>
+                    Logout
+                  </div>
+                )}
+
+                {/* Tampilkan tombol Login jika pengguna tidak login */}
+                {!user && (
+                  <Link to="/">
+                    <div className="inline-block px-4 py-2 mr-2 text-center text-white cursor-pointer">
                       <i className="mr-3 fas fa-sign-out-alt"></i>
                       Logout
                     </div>
-                  )}
-
-                  {/* Tampilkan tombol Login jika pengguna tidak login */}
-                  {!user && (
-                    <Link to="/">
-                      <div className="inline-block px-4 py-2 mr-2 text-center text-white">
-                        <i className="mr-3 fas fa-sign-out-alt"></i>
-                        Logout
-                      </div>
-                    </Link>
-                  )}
-                </li>
+                  </Link>
+                )}
+              </li>
               </button>
             </ul>
           </div>

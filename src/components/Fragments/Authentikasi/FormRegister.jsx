@@ -1,9 +1,9 @@
-// FormRegister.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
 import InputForm from "../../Elements/Input";
 import Button from "../../Elements/Button";
+import { useNavigate } from "react-router-dom"; // Ganti menjadi useNavigate
 
 function FormRegister() {
   const [formData, setFormData] = useState({
@@ -13,6 +13,7 @@ function FormRegister() {
   });
 
   const [nextId, setNextId] = useState(null);
+  const navigate = useNavigate(); // Ganti menjadi useNavigate
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -20,7 +21,6 @@ function FormRegister() {
         const response = await axios.get("http://localhost:3000/users");
         const users = response.data;
 
-        // Tentukan id berikutnya berdasarkan data pengguna saat ini
         const newId = users.length > 0 ? users[users.length - 1].id + 1 : 1;
 
         setNextId(newId);
@@ -42,9 +42,7 @@ function FormRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validasi input form
     if (!formData.username || !formData.email || !formData.password) {
-      // Tampilkan pesan SweetAlert2 untuk input yang kosong
       Swal.fire({
         icon: 'error',
         title: 'Kolom Kosong',
@@ -54,36 +52,30 @@ function FormRegister() {
     }
 
     try {
-      // Set data pengguna baru termasuk id
       const newUserData = { ...formData, role: "pasien", id: nextId };
 
-      // Simpan data ke localStorage
       const usersFromLocalStorage = JSON.parse(localStorage.getItem("users")) || [];
       const updatedUsers = [...usersFromLocalStorage, newUserData];
       localStorage.setItem("users", JSON.stringify(updatedUsers));
 
-      // Kirim data ke db.json
       await axios.post("http://localhost:3000/users", newUserData);
 
-      // Tampilkan pesan sukses menggunakan SweetAlert2
       await Swal.fire({
         icon: 'success',
         title: 'Registrasi Berhasil',
         text: 'Anda telah berhasil terdaftar!',
       });
 
-      // Redirect atau navigasi ke halaman login
-      window.location.href = "/login"; // Ganti dengan halaman yang sesuai
+      // Navigasi ke halaman login menggunakan navigate
+      navigate("/login");
     } catch (error) {
       console.error("Error:", error);
 
-      // Tampilkan pesan error menggunakan SweetAlert2
       await Swal.fire({
         icon: 'error',
         title: 'Registrasi Gagal',
         text: 'Terjadi kesalahan saat registrasi. Silakan coba lagi.',
       });
-      // Handle error, misalnya tampilkan pesan kesalahan
     }
   };
 

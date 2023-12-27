@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
+import {BiLogoWhatsapp, BiLogoGmail } from 'react-icons/bi';
 import InputForm from "../../Elements/Input";
 import Button from "../../Elements/Button";
 
@@ -99,6 +100,18 @@ function FormLogin() {
       >
         {loading ? 'Masuk...' : 'Masuk'}
       </Button>
+
+      <div className="mt-2 text-center font-thin">
+      <p className="mt-2 text-sm text-gray-600">
+        Lupa password? Hubungi admin!
+        <a href="mailto:admin@gmail.com" className="ml-1" target="_blank" >
+          <BiLogoGmail className="inline-block text-blue-500" />
+        </a>
+        <a href="https://wa.me/1234567890" className="ml-2" target="_blank">
+          <BiLogoWhatsapp className="inline-block text-green-500" />
+        </a>
+      </p>
+      </div>
     </form>
   );
 }

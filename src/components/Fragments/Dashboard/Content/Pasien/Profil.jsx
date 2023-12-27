@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { BiEdit, BiEnvelope, BiLock, BiUser } from "react-icons/bi";
+import { BiEdit, BiUser, BiEnvelope, BiLock } from "react-icons/bi";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 function ProfilPasien() {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [dataUser, setDataUser] = useState({});
+  const navigate = useNavigate();
 
   const getUserLoggedIn = async () => {
     const res = localStorage.getItem("user");
@@ -40,9 +42,7 @@ function ProfilPasien() {
   }, [userLoggedIn]);
 
   const data = {
-    image: `https://api.dicebear.com/7.x/lorelei-neutral/svg?seed=${
-      dataUser.username || ""
-    }`,
+    image: `https://api.dicebear.com/7.x/lorelei-neutral/svg?seed=${dataUser.username || ""}`,
   };
 
   const isValidEmail = (email) => {
@@ -52,6 +52,7 @@ function ProfilPasien() {
 
   const handleEdit = async () => {
     try {
+      // Show Swal modal for editing profile
       const { value: formValues, dismiss } = await Swal.fire({
         title: "Edit Profil",
         html: `<input id="swal-input1" class="swal2-input" placeholder="Nama" value="${dataUser.username || ""}">
@@ -63,44 +64,58 @@ function ProfilPasien() {
           const name = document.getElementById("swal-input1").value;
           const email = document.getElementById("swal-input2").value;
           const password = document.getElementById("swal-input3").value;
-  
+
           if (!name.trim() || !email.trim() || password === undefined || password.trim() === "") {
             Swal.showValidationMessage("Pastikan semua data terisi");
             return false;
           }
-  
+
           if (!isValidEmail(email)) {
             Swal.showValidationMessage("Masukkan email yang valid");
             return false;
           }
-  
+
           return [name, email, password];
         },
       });
-  
+
+      // Process formValues if not canceled
       if (formValues) {
-        const [name, email, password] = formValues;
-        const data = {
-          username: name,
-          email: email,
-          password: password,
-        };
-  
-        const res = await axios.patch(
-          `http://localhost:3000/users/${dataUser.id}`,
-          data
-        );
-        localStorage.setItem("user", JSON.stringify(res.data));
-  
-        // Logout user
-        setUserLoggedIn(false);
-  
-        // Redirect to "/login" after a delay
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 200);
-      } else if (dismiss === Swal.DismissReason.cancel) {
-        console.log("Editing canceled");
+        // Show SweetAlert2 konfirmasi menggunakan tombol "Ya, saya yakin" dan "Batal"
+        const confirmResult = await Swal.fire({
+          title: "Konfirmasi Edit Profil",
+          text: "Pastikan Anda sudah yakin untuk mengedit data Anda, karena sistem akan terlogout otomatis.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Ya, saya yakin",
+          cancelButtonText: "Batal",
+          reverseButtons: true,
+        });
+
+        // Jika pengguna menekan tombol "Ya, saya yakin"
+        if (confirmResult.isConfirmed) {
+          const [name, email, password] = formValues;
+          const data = {
+            username: name,
+            email: email,
+            password: password,
+          };
+
+          await axios.patch(
+            `http://localhost:3000/users/${dataUser.id}`,
+            data
+          );
+          localStorage.setItem("user", JSON.stringify(data));
+
+          // Logout user
+          setUserLoggedIn(false);
+
+          // Redirect to "/login" using useNavigate
+          navigate("/login");
+        } else if (dismiss === Swal.DismissReason.cancel) {
+          // Handle cancel action here
+          console.log("Editing canceled");
+        }
       }
     } catch (error) {
       console.error("Error editing profile:", error);
